@@ -12,9 +12,10 @@ export default async function RecipePage({
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 p-6">
-      <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-gradient-to-br from-zinc-200 to-zinc-300 text-lg font-medium shadow-sm dark:from-zinc-800 dark:to-zinc-900">
-        {data.name}
-      </div>
+      <div
+        aria-hidden="true"
+        className="aspect-square rounded-2xl bg-white shadow-sm"
+      />
 
       <h1 className="text-2xl font-semibold">{data.name}</h1>
 
