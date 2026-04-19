@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    // Cache optimized images for one year. When replacing an image,
+    // rename the file so clients see the new version.
+    minimumCacheTTL: 60 * 60 * 24 * 365,
+  },
 };
 
 export default nextConfig;
