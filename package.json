@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -k -n next,convex -c blue,magenta \"next dev\" \"convex dev\"",
-    "build": "next build",
+    "build": "convex codegen && next build",
     "start": "next start",
     "lint": "eslint"
   },
