@@ -6,14 +6,14 @@ export type Recipe = {
   steps: string[];
 };
 
-export type Category = {
+export type User = {
   slug: string;
   name: string;
   image?: string;
   recipes: Recipe[];
 };
 
-export const categories: Category[] = [
+export const users: User[] = [
   {
     slug: "vicky",
     name: "Vicky",
@@ -146,13 +146,13 @@ export const categories: Category[] = [
   },
 ];
 
-export function getCategory(slug: string): Category | undefined {
-  return categories.find((c) => c.slug === slug);
+export function getUser(slug: string): User | undefined {
+  return users.find((u) => u.slug === slug);
 }
 
 export function getRecipe(
-  categorySlug: string,
+  userSlug: string,
   recipeSlug: string,
 ): Recipe | undefined {
-  return getCategory(categorySlug)?.recipes.find((r) => r.slug === recipeSlug);
+  return getUser(userSlug)?.recipes.find((r) => r.slug === recipeSlug);
 }

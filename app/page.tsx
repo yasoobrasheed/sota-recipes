@@ -2,25 +2,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
-import { categories } from "@/lib/recipes";
+import { users } from "@/lib/recipes";
 
 export default async function Home() {
-  const users = await fetchQuery(api.users.list, {});
-  const userBySlug = new Map(
-    users.map((u) => [u.name.split(" ")[0].toLowerCase(), u]),
+  const convexUsers = await fetchQuery(api.users.list, {});
+  const convexUserBySlug = new Map(
+    convexUsers.map((u) => [u.name.split(" ")[0].toLowerCase(), u]),
   );
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 p-6 md:max-w-3xl md:flex-row md:items-center">
-      {categories.map((category, index) => {
-        const user = userBySlug.get(category.slug);
-        const imageSrc = user?.imageUrl ?? category.image;
-        const label = (user?.name ?? category.name).split(" ")[0].toLowerCase();
+      {users.map((user, index) => {
+        const convexUser = convexUserBySlug.get(user.slug);
+        const imageSrc = convexUser?.imageUrl ?? user.image;
+        const label = (convexUser?.name ?? user.name)
+          .split(" ")[0]
+          .toLowerCase();
 
         return (
           <Link
-            key={category.slug}
-            href={`/${category.slug}`}
+            key={user.slug}
+            href={`/${user.slug}`}
             aria-label={label}
             className="flex flex-1 flex-col items-center gap-3 transition-transform hover:scale-[1.02] active:scale-[0.99]"
           >
