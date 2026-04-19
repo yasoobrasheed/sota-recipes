@@ -12,3 +12,11 @@ This app must look good on mobile. Any CSS you write must render cleanly at phon
 - Avoid fixed pixel widths that can overflow on small screens; prefer fluid units, flex, and grid.
 - Do not assume hover states — they don't exist on touch. Hover is additive polish, not required affordance.
 - Test any layout change mentally at ~375px before shipping.
+
+<!-- convex-ai-start -->
+This project uses [Convex](https://convex.dev) as its backend.
+
+When working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.
+
+Convex agent skills for common tasks can be installed by running `npx convex ai-files install`.
+<!-- convex-ai-end -->
