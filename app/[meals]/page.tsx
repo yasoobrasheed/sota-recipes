@@ -1,34 +1,59 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCategory } from "@/lib/recipes";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "@/convex/_generated/api";
 
-export default async function CategoryPage({
+export default async function UserPage({
   params,
 }: {
   params: Promise<{ meals: string }>;
 }) {
   const { meals } = await params;
-  const cat = getCategory(meals);
-  if (!cat) notFound();
+
+  const convexUsers = await fetchQuery(api.users.list, {});
+  const convexUser = convexUsers.find(
+    (u) => u.name.split(" ")[0].toLowerCase() === meals,
+  );
+  if (!convexUser) notFound();
+
+  const recipes = await fetchQuery(api.recipes.listByUser, {
+    userId: convexUser._id,
+  });
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-4 p-4 pb-24">
-      <div className="grid grid-cols-2 gap-4">
-        {cat.recipes.map((recipe) => (
+    <main className="mx-auto grid w-full max-w-md flex-1 grid-cols-2 gap-6 p-6 md:max-w-5xl md:grid-cols-4">
+      {recipes.map((recipe) => {
+        const label = recipe.name.toLowerCase();
+        return (
           <Link
-            key={recipe.slug}
-            href={`/${cat.slug}/${recipe.slug}`}
-            aria-label={recipe.name}
-            className="aspect-square rounded-2xl bg-white shadow-sm transition-transform hover:scale-[1.02] active:scale-[0.99]"
-          />
-        ))}
-      </div>
-
-      <button
-        type="button"
-        aria-label="Add recipe"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-foreground shadow-lg"
-      />
+            key={recipe._id}
+            href={`/${meals}/${recipe._id}`}
+            aria-label={label}
+            className="flex flex-col items-center gap-3 transition-transform hover:scale-[1.02] active:scale-[0.99]"
+          >
+            <div className="relative aspect-square w-[70%]">
+              {recipe.imageUrl && (
+                <Image
+                  src={recipe.imageUrl}
+                  alt=""
+                  fill
+                  sizes="(max-width: 640px) 50vw, 240px"
+                  className="object-contain"
+                />
+              )}
+            </div>
+            <span
+              className="text-center text-base sm:text-lg"
+              style={{
+                fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
+              }}
+            >
+              {label}
+            </span>
+          </Link>
+        );
+      })}
     </main>
   );
 }
