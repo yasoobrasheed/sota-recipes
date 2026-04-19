@@ -7,7 +7,8 @@
     "build": "convex codegen && next build",
     "start": "next start",
     "lint": "eslint",
-    "blob:put": "tsx --env-file=.env.local scripts/upload-image.ts"
+    "blob:put": "tsx --env-file=.env.local scripts/upload-image.ts",
+    "users:add": "tsx --env-file=.env.local scripts/add-users.ts"
   },
   "dependencies": {
     "@vercel/blob": "^2.3.3",
