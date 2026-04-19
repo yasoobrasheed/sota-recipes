@@ -1,10 +1,19 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-export const list = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("recipes").order("desc").collect();
+export const listByUser = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    const recipes = await ctx.db
+      .query("recipes")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .order("desc")
+      .collect();
+    return recipes.map((recipe) => ({
+      _id: recipe._id,
+      name: recipe.name,
+      imageUrl: recipe.imageUrl,
+    }));
   },
 });
 
@@ -17,6 +26,7 @@ export const get = query({
 
 export const create = mutation({
   args: {
+    userId: v.id("users"),
     name: v.string(),
     imageUrl: v.optional(v.string()),
     ingredients: v.array(v.string()),
