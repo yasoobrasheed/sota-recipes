@@ -54,9 +54,11 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-12 w-full items-center justify-center rounded-2xl border-2 border-dashed border-zinc-300 text-sm font-medium text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-700 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-300"
+        aria-label="Add new recipe"
+        style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
+        className="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full border-2 border-black bg-white text-2xl leading-none text-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all hover:-translate-y-px hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
       >
-        + Add new recipe
+        <span aria-hidden="true" className="block leading-none">+</span>
       </button>
 
       {open && document.body && createPortal(
@@ -76,14 +78,15 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
             onClick={closeModal}
           >
             <div
-              className="relative w-full max-w-md rounded-2xl bg-white shadow-xl dark:bg-zinc-900"
+              className="relative w-full max-w-md rounded-2xl border-2 border-black bg-white shadow-[2px_2px_0_0_rgba(0,0,0,1)]"
+              style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
                 <div className="mb-5 flex items-center justify-between">
                   <h2
                     id="add-recipe-title"
-                    className="text-lg font-semibold text-zinc-900 dark:text-zinc-50"
+                    className="text-lg font-semibold text-black"
                   >
                     Add new recipe
                   </h2>
@@ -91,13 +94,13 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
                     type="button"
                     onClick={closeModal}
                     aria-label="Close"
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-black"
                   >
                     ✕
                   </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                <form onSubmit={handleSubmit} className="flex items-stretch gap-2">
                   <input
                     type="url"
                     value={url}
@@ -105,19 +108,19 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
                     placeholder="https://example.com/recipe"
                     required
                     autoFocus
-                    className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-base text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 sm:py-2.5 sm:text-sm"
+                    className="min-w-0 flex-1 rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder:text-zinc-400 focus:outline-none"
                   />
                   <button
                     type="submit"
                     disabled={isPending}
-                    className="h-11 rounded-lg bg-zinc-900 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300 sm:h-10"
+                    className="shrink-0 rounded-lg border-2 border-black bg-white px-4 text-sm text-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all hover:-translate-y-px hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
                   >
-                    {isPending ? 'Importing…' : 'Add custom recipe'}
+                    {isPending ? '…' : 'Import'}
                   </button>
                 </form>
 
                 {error && (
-                  <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>
+                  <p className="mt-3 text-sm text-red-600">{error}</p>
                 )}
               </div>
             </div>
