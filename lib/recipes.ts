@@ -15,8 +15,9 @@ export type Category = {
 
 export const categories: Category[] = [
   {
-    slug: "breakfast",
-    name: "Breakfast",
+    slug: "vicky",
+    name: "Vicky",
+    image: "/images/vicky.png",
     recipes: [
       {
         slug: "pancakes",
@@ -72,8 +73,9 @@ export const categories: Category[] = [
     ],
   },
   {
-    slug: "dinner",
-    name: "Dinner",
+    slug: "yasoob",
+    name: "Yasoob",
+    image: "/images/yasoob.png",
     recipes: [
       {
         slug: "spaghetti-aglio-e-olio",
