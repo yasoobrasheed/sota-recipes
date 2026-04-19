@@ -24,3 +24,13 @@ export const create = mutation({
     return await ctx.db.insert("users", args);
   },
 });
+
+export const updateImageUrl = mutation({
+  args: {
+    id: v.id("users"),
+    imageUrl: v.string(),
+  },
+  handler: async (ctx, { id, imageUrl }) => {
+    await ctx.db.patch(id, { imageUrl });
+  },
+});
