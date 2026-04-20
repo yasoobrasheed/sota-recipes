@@ -4,6 +4,73 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
+import { upload } from "@vercel/blob/client";
+
+const EXT_BY_CONTENT_TYPE: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/jpg": "jpg",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/avif": "avif",
+};
+
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10 MB pre-resize cap
+const RESIZE_MAX_EDGE = 1200;
+const RESIZE_QUALITY = 0.8;
+
+function blobPathname(recipeId: string, file: File) {
+  const key = (file.type || "").split(";")[0].trim().toLowerCase();
+  const ext =
+    EXT_BY_CONTENT_TYPE[key] ||
+    file.name.split(".").pop()?.toLowerCase() ||
+    "jpg";
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/\.\d{3}Z$/, "Z")
+    .replace(/:/g, "-");
+  return `recipes/${recipeId}_${timestamp}.${ext}`;
+}
+
+// Downscale to RESIZE_MAX_EDGE on the long edge and re-encode to WebP.
+// Returns the original file if the canvas pipeline isn't available,
+// if the format is animated (GIF), or if the result wouldn't be smaller.
+async function resizeImage(file: File): Promise<File> {
+  if (file.type === "image/gif") return file;
+  if (typeof createImageBitmap !== "function") return file;
+
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    return file;
+  }
+
+  const { width, height } = bitmap;
+  const longEdge = Math.max(width, height);
+  const scale = longEdge > RESIZE_MAX_EDGE ? RESIZE_MAX_EDGE / longEdge : 1;
+  const targetW = Math.max(1, Math.round(width * scale));
+  const targetH = Math.max(1, Math.round(height * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetW;
+  canvas.height = targetH;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    bitmap.close();
+    return file;
+  }
+  ctx.drawImage(bitmap, 0, 0, targetW, targetH);
+  bitmap.close();
+
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob(resolve, "image/webp", RESIZE_QUALITY),
+  );
+  if (!blob || blob.size >= file.size) return file;
+
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "image";
+  return new File([blob], `${baseName}.webp`, { type: "image/webp" });
+}
 
 export default function RecipeImage({
   recipeId,
@@ -79,6 +146,10 @@ export default function RecipeImage({
       setError("please pick an image file");
       return;
     }
+    if (f.size > MAX_UPLOAD_BYTES) {
+      setError("image is too large (max 10 MB)");
+      return;
+    }
     setFile(f);
     setError(null);
   }
@@ -92,31 +163,46 @@ export default function RecipeImage({
     }
     startTransition(async () => {
       try {
-        let res: Response;
         if (file) {
-          const fd = new FormData();
-          fd.append("recipeId", recipeId);
-          fd.append("file", file);
-          res = await fetch("/api/recipes/upload-image", {
+          const optimized = await resizeImage(file);
+          const blob = await upload(
+            blobPathname(recipeId, optimized),
+            optimized,
+            {
+              access: "public",
+              handleUploadUrl: "/api/blob/upload",
+              clientPayload: JSON.stringify({ recipeId }),
+              contentType: optimized.type || undefined,
+            },
+          );
+          const patchRes = await fetch("/api/recipes/set-image", {
             method: "POST",
-            body: fd,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ recipeId, imageUrl: blob.url }),
           });
+          if (!patchRes.ok) {
+            const data = await patchRes.json().catch(() => ({}));
+            setError(data.error ?? "uploaded but failed to save");
+            return;
+          }
         } else {
-          res = await fetch("/api/recipes/upload-image", {
+          const res = await fetch("/api/recipes/upload-image", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ recipeId, imageUrl: url }),
           });
+          if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            setError(data.error ?? "something went wrong");
+            return;
+          }
         }
-        const data = await res.json();
-        if (!res.ok) {
-          setError(data.error ?? "something went wrong");
-        } else {
-          closeModal();
-          router.refresh();
-        }
-      } catch {
-        setError("failed to connect to the server");
+        closeModal();
+        router.refresh();
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "failed to upload the image",
+        );
       }
     });
   }

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
+import Breadcrumb from "@/app/components/Breadcrumb";
 import RecipeImage from "@/app/components/RecipeImage";
 import ScrollableSection from "@/app/components/ScrollableSection";
 import EditButton from "@/app/components/EditButton";
@@ -14,14 +15,30 @@ export default async function RecipePage({
 }) {
   const { user_id, recipe } = await params;
 
-  const data = await fetchQuery(api.recipes.get, {
-    id: recipe as Id<"recipes">,
-  }).catch(() => null);
-  if (!data) notFound();
+  const [data, user] = await Promise.all([
+    fetchQuery(api.recipes.get, { id: recipe as Id<"recipes"> }).catch(
+      () => null,
+    ),
+    fetchQuery(api.users.get, { id: user_id as Id<"users"> }).catch(
+      () => null,
+    ),
+  ]);
+  if (!data || !user) notFound();
+
+  const firstName = user.name.split(" ")[0].toLowerCase();
+  const dishName = data.name.toLowerCase();
 
   return (
+    <>
+    <Breadcrumb
+      items={[
+        { label: "home", href: "/" },
+        { label: firstName, href: `/${user_id}/recipes` },
+        { label: dishName },
+      ]}
+    />
     <main
-      className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 p-6 md:h-screen md:max-w-4xl md:flex-none md:grid md:grid-cols-2 md:grid-rows-[auto_auto_minmax(0,1fr)] md:gap-x-8 md:gap-y-6 md:overflow-hidden"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 p-6 md:max-w-4xl md:grid md:min-h-0 md:grid-cols-2 md:grid-rows-[auto_auto_minmax(0,1fr)] md:gap-x-8 md:gap-y-6 md:overflow-hidden"
       style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
     >
       <div className="flex items-center gap-2 md:col-span-2">
@@ -72,5 +89,6 @@ export default async function RecipePage({
         </ol>
       </ScrollableSection>
     </main>
+    </>
   );
 }
