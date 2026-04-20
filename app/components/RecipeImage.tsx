@@ -218,7 +218,7 @@ export default function RecipeImage({
                         const f = e.dataTransfer.files?.[0];
                         if (f) pickFile(f);
                       }}
-                      className={`flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors ${
+                      className={`flex min-h-56 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-4 text-center transition-colors ${
                         dragOver
                           ? "border-black bg-zinc-100"
                           : "border-zinc-300 bg-zinc-50 hover:border-black"
@@ -270,29 +270,21 @@ export default function RecipeImage({
                       />
                     </label>
 
-                    <div className="flex items-center gap-2 text-xs text-zinc-400">
-                      <span className="h-px flex-1 bg-zinc-200" />
-                      <span>or paste a URL</span>
-                      <span className="h-px flex-1 bg-zinc-200" />
-                    </div>
-
-                    <div className="flex items-stretch gap-2">
-                      <input
-                        type="url"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        placeholder="https://example.com/image.jpg"
-                        disabled={!!file}
-                        className="min-w-0 flex-1 rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder:text-zinc-400 focus:outline-none disabled:opacity-50"
-                      />
-                      <button
-                        type="submit"
-                        disabled={isPending || (!file && !url)}
-                        className="shrink-0 rounded-lg border-2 border-zinc-500 bg-white px-4 text-sm text-zinc-500 shadow-[2px_2px_0_0_rgba(113,113,122,1)] transition-all hover:-translate-y-px hover:border-black hover:text-black hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:border-zinc-500 disabled:hover:text-zinc-500 disabled:hover:shadow-[2px_2px_0_0_rgba(113,113,122,1)]"
-                      >
-                        {isPending ? "…" : "upload"}
-                      </button>
-                    </div>
+                    <input
+                      type="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                      disabled={!!file}
+                      className="w-full rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder:text-zinc-400 focus:outline-none disabled:cursor-not-allowed disabled:border-zinc-500 disabled:text-zinc-500 disabled:opacity-50 disabled:placeholder:text-zinc-500"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isPending || (!file && !url.trim())}
+                      className="w-full rounded-lg border-2 border-zinc-500 bg-white px-4 py-2 text-sm text-zinc-500 shadow-[2px_2px_0_0_rgba(113,113,122,1)] transition-all hover:-translate-y-px hover:border-black hover:text-black hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:border-zinc-500 disabled:hover:text-zinc-500 disabled:hover:shadow-[2px_2px_0_0_rgba(113,113,122,1)]"
+                    >
+                      {isPending ? "…" : "upload"}
+                    </button>
                   </form>
 
                   {error && (
