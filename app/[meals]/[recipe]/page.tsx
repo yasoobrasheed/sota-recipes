@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
+import RecipeImage from "@/app/components/RecipeImage";
 
 export default async function RecipePage({
   params,
@@ -26,16 +26,13 @@ export default async function RecipePage({
       <div className="flex flex-col gap-8 md:grid md:min-h-0 md:flex-1 md:grid-cols-2 md:gap-8">
         <div className="flex flex-col gap-6 md:min-h-0">
           <div className="relative mx-auto aspect-square w-[42%] md:w-[60%] md:flex-none">
-            {data.imageUrl && (
-              <Image
-                src={data.imageUrl}
-                alt=""
-                fill
-                sizes="(max-width: 768px) 70vw, 400px"
-                className="object-contain"
-                priority
-              />
-            )}
+            <RecipeImage
+              recipeId={data._id}
+              imageUrl={data.imageUrl}
+              alt={data.name}
+              sizes="(max-width: 768px) 70vw, 400px"
+              priority
+            />
           </div>
 
           <section className="md:min-h-0 md:flex-1 md:overflow-y-auto md:pr-2">
