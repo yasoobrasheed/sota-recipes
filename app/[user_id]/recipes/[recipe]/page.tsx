@@ -9,7 +9,7 @@ import EditButton from "@/app/components/EditButton";
 export default async function RecipePage({
   params,
 }: {
-  params: Promise<{ meals: string; recipe: string }>;
+  params: Promise<{ user_id: string; recipe: string }>;
 }) {
   const { recipe } = await params;
 

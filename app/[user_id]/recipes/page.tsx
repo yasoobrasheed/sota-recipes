@@ -5,16 +5,16 @@ import { api } from "@/convex/_generated/api";
 import AddRecipeModal from "@/app/components/AddRecipeModal";
 import RecipeImage from "@/app/components/RecipeImage";
 
-export default async function UserPage({
+export default async function UserRecipesPage({
   params,
 }: {
-  params: Promise<{ meals: string }>;
+  params: Promise<{ user_id: string }>;
 }) {
-  const { meals } = await params;
+  const { user_id } = await params;
 
   const convexUsers = await fetchQuery(api.users.list, {});
   const convexUser = convexUsers.find(
-    (u) => u.name.split(" ")[0].toLowerCase() === meals,
+    (u) => u.name.split(" ")[0].toLowerCase() === user_id,
   );
   if (!convexUser) notFound();
 
@@ -30,7 +30,7 @@ export default async function UserPage({
           return (
             <Link
               key={recipe._id}
-              href={`/${meals}/${recipe._id}`}
+              href={`/${user_id}/recipes/${recipe._id}`}
               aria-label={label}
               className="flex flex-col items-center gap-3 transition-transform hover:scale-[1.02] active:scale-[0.99]"
             >
@@ -53,7 +53,7 @@ export default async function UserPage({
           );
         })}
       </div>
-      <AddRecipeModal userId={convexUser._id} meals={meals} />
+      <AddRecipeModal userId={convexUser._id} userSlug={user_id} />
     </main>
   );
 }

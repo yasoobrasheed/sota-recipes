@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, useTransition } from 'react'
 import { createPortal } from 'react-dom'
 
-export default function AddRecipeModal({ userId, meals }: { userId: string; meals: string }) {
+export default function AddRecipeModal({ userId, userSlug }: { userId: string; userSlug: string }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [url, setUrl] = useState('')
@@ -41,7 +41,7 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
         if (!res.ok) {
           setError(data.error ?? 'Something went wrong')
         } else {
-          router.push(`/${meals}/${data.id}`)
+          router.push(`/${userSlug}/recipes/${data.id}`)
         }
       } catch {
         setError('Failed to connect to the server')
