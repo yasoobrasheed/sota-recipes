@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState, useTransition } from 'react'
+import { createPortal } from 'react-dom'
 
 export default function AddRecipeModal({ userId, meals }: { userId: string; meals: string }) {
   const router = useRouter()
@@ -88,7 +88,7 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
                     id="add-recipe-title"
                     className="text-lg font-semibold text-black"
                   >
-                    Add new recipe
+                    new recipe
                   </h2>
                   <button
                     type="button"
@@ -115,7 +115,7 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
                     disabled={isPending}
                     className="shrink-0 rounded-lg border-2 border-black bg-white px-4 text-sm text-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all hover:-translate-y-px hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
                   >
-                    {isPending ? '…' : 'Import'}
+                    {isPending ? '…' : 'import'}
                   </button>
                 </form>
 
