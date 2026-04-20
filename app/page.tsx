@@ -22,7 +22,7 @@ export default async function Home() {
         return (
           <Link
             key={user.slug}
-            href={`/${user.slug}`}
+            href={`/${user.slug}/recipes`}
             aria-label={label}
             className="flex flex-1 flex-col items-center gap-3 transition-transform hover:scale-[1.02] active:scale-[0.99]"
           >

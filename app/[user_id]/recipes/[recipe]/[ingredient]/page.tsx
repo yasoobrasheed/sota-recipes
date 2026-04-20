@@ -32,9 +32,9 @@ function fmt(value: number | undefined): string {
 export default async function IngredientPage({
   params,
 }: {
-  params: Promise<{ meals: string; recipe: string; ingredient: string }>;
+  params: Promise<{ user_id: string; recipe: string; ingredient: string }>;
 }) {
-  const { meals, recipe, ingredient } = await params;
+  const { user_id, recipe, ingredient } = await params;
   const searchTerm = extractName(decodeURIComponent(ingredient));
 
   if (!searchTerm) notFound();
@@ -52,7 +52,7 @@ export default async function IngredientPage({
       className="mx-auto w-full max-w-md p-6"
       style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
     >
-      <Link href={`/${meals}/${recipe}`} className="text-sm underline underline-offset-2">
+      <Link href={`/${user_id}/recipes/${recipe}`} className="text-sm underline underline-offset-2">
         ← Back
       </Link>
 

@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useTransition, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState, useTransition } from 'react'
+import { createPortal } from 'react-dom'
 
-export default function AddRecipeModal({ userId, meals }: { userId: string; meals: string }) {
+export default function AddRecipeModal({ userId, userSlug }: { userId: string; userSlug: string }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [url, setUrl] = useState('')
@@ -41,7 +41,7 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
         if (!res.ok) {
           setError(data.error ?? 'Something went wrong')
         } else {
-          router.push(`/${meals}/${data.id}`)
+          router.push(`/${userSlug}/recipes/${data.id}`)
         }
       } catch {
         setError('Failed to connect to the server')
@@ -56,7 +56,7 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
         onClick={() => setOpen(true)}
         aria-label="Add new recipe"
         style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
-        className="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full border-2 border-black bg-white text-2xl leading-none text-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all hover:-translate-y-px hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+        className="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full border-2 border-zinc-500 bg-white text-2xl leading-none text-zinc-500 shadow-[2px_2px_0_0_rgba(113,113,122,1)] transition-all hover:-translate-y-px hover:border-black hover:text-black hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
       >
         <span aria-hidden="true" className="block leading-none">+</span>
       </button>
@@ -88,7 +88,7 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
                     id="add-recipe-title"
                     className="text-lg font-semibold text-black"
                   >
-                    Add new recipe
+                    new recipe
                   </h2>
                   <button
                     type="button"
@@ -112,10 +112,10 @@ export default function AddRecipeModal({ userId, meals }: { userId: string; meal
                   />
                   <button
                     type="submit"
-                    disabled={isPending}
-                    className="shrink-0 rounded-lg border-2 border-black bg-white px-4 text-sm text-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all hover:-translate-y-px hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
+                    disabled={isPending || !url.trim()}
+                    className="shrink-0 rounded-lg border-2 border-zinc-500 bg-white px-4 text-sm text-zinc-500 shadow-[2px_2px_0_0_rgba(113,113,122,1)] transition-all hover:-translate-y-px hover:border-black hover:text-black hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:border-zinc-500 disabled:hover:text-zinc-500 disabled:hover:shadow-[2px_2px_0_0_rgba(113,113,122,1)]"
                   >
-                    {isPending ? '…' : 'Import'}
+                    {isPending ? '…' : 'import'}
                   </button>
                 </form>
 
