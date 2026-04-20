@@ -19,10 +19,12 @@ export default async function Home() {
           .split(" ")[0]
           .toLowerCase();
 
+        if (!convexUser) return null;
+
         return (
           <Link
             key={user.slug}
-            href={`/${user.slug}/recipes`}
+            href={`/${convexUser._id}/recipes`}
             aria-label={label}
             className="flex flex-1 flex-col items-center gap-3 transition-transform hover:scale-[1.02] active:scale-[0.99]"
           >

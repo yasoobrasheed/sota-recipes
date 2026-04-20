@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
+import type { Id } from "@/convex/_generated/dataModel";
 import AddRecipeModal from "@/app/components/AddRecipeModal";
 import RecipeImage from "@/app/components/RecipeImage";
 
@@ -12,10 +13,9 @@ export default async function UserRecipesPage({
 }) {
   const { user_id } = await params;
 
-  const convexUsers = await fetchQuery(api.users.list, {});
-  const convexUser = convexUsers.find(
-    (u) => u.name.split(" ")[0].toLowerCase() === user_id,
-  );
+  const convexUser = await fetchQuery(api.users.get, {
+    id: user_id as Id<"users">,
+  }).catch(() => null);
   if (!convexUser) notFound();
 
   const recipes = await fetchQuery(api.recipes.listByUser, {
@@ -53,7 +53,7 @@ export default async function UserRecipesPage({
           );
         })}
       </div>
-      <AddRecipeModal userId={convexUser._id} userSlug={user_id} />
+      <AddRecipeModal userId={convexUser._id} />
     </main>
   );
 }
