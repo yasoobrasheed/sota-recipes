@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 
 export default function RecipeImage({
@@ -21,8 +21,11 @@ export default function RecipeImage({
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -36,28 +39,55 @@ export default function RecipeImage({
   function closeModal() {
     setOpen(false);
     setUrl("");
+    setFile(null);
+    setDragOver(false);
+    setError(null);
+  }
+
+  function pickFile(f: File | null) {
+    if (!f) return;
+    if (!f.type.startsWith("image/")) {
+      setError("please pick an image file");
+      return;
+    }
+    setFile(f);
     setError(null);
   }
 
   function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    if (!file && !url) {
+      setError("add a file or URL");
+      return;
+    }
     startTransition(async () => {
       try {
-        const res = await fetch("/api/recipes/upload-image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ recipeId, imageUrl: url }),
-        });
+        let res: Response;
+        if (file) {
+          const fd = new FormData();
+          fd.append("recipeId", recipeId);
+          fd.append("file", file);
+          res = await fetch("/api/recipes/upload-image", {
+            method: "POST",
+            body: fd,
+          });
+        } else {
+          res = await fetch("/api/recipes/upload-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ recipeId, imageUrl: url }),
+          });
+        }
         const data = await res.json();
         if (!res.ok) {
-          setError(data.error ?? "Something went wrong");
+          setError(data.error ?? "something went wrong");
         } else {
           closeModal();
           router.refresh();
         }
       } catch {
-        setError("Failed to connect to the server");
+        setError("failed to connect to the server");
       }
     });
   }
@@ -146,26 +176,78 @@ export default function RecipeImage({
                     </button>
                   </div>
 
-                  <form
-                    onSubmit={handleSubmit}
-                    className="flex items-stretch gap-2"
-                  >
-                    <input
-                      type="url"
-                      value={url}
-                      onChange={(e) => setUrl(e.target.value)}
-                      placeholder="https://example.com/image.jpg"
-                      required
-                      autoFocus
-                      className="min-w-0 flex-1 rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder:text-zinc-400 focus:outline-none"
-                    />
-                    <button
-                      type="submit"
-                      disabled={isPending}
-                      className="shrink-0 rounded-lg border-2 border-black bg-white px-4 text-sm text-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all hover:-translate-y-px hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                    <label
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragOver(true);
+                      }}
+                      onDragLeave={() => setDragOver(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setDragOver(false);
+                        const f = e.dataTransfer.files?.[0];
+                        if (f) pickFile(f);
+                      }}
+                      className={`flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed px-4 py-8 text-center transition-colors ${
+                        dragOver
+                          ? "border-black bg-zinc-100"
+                          : "border-zinc-300 bg-zinc-50 hover:border-black"
+                      }`}
                     >
-                      {isPending ? "…" : "upload"}
-                    </button>
+                      {file ? (
+                        <>
+                          <span className="text-sm text-black">
+                            {file.name}
+                          </span>
+                          <span className="text-xs text-zinc-500">
+                            tap to choose a different photo
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-sm text-black">
+                            drag &amp; drop an image
+                          </span>
+                          <span className="text-xs text-zinc-500">
+                            or tap to choose from your device
+                          </span>
+                        </>
+                      )}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) =>
+                          pickFile(e.target.files?.[0] ?? null)
+                        }
+                      />
+                    </label>
+
+                    <div className="flex items-center gap-2 text-xs text-zinc-400">
+                      <span className="h-px flex-1 bg-zinc-200" />
+                      <span>or paste a URL</span>
+                      <span className="h-px flex-1 bg-zinc-200" />
+                    </div>
+
+                    <div className="flex items-stretch gap-2">
+                      <input
+                        type="url"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                        placeholder="https://example.com/image.jpg"
+                        disabled={!!file}
+                        className="min-w-0 flex-1 rounded-lg border-2 border-black bg-white px-3 py-2 text-sm text-black placeholder:text-zinc-400 focus:outline-none disabled:opacity-50"
+                      />
+                      <button
+                        type="submit"
+                        disabled={isPending || (!file && !url)}
+                        className="shrink-0 rounded-lg border-2 border-black bg-white px-4 text-sm text-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all hover:-translate-y-px hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)]"
+                      >
+                        {isPending ? "…" : "upload"}
+                      </button>
+                    </div>
                   </form>
 
                   {error && (
