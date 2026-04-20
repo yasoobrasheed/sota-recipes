@@ -45,7 +45,10 @@ export default function ScrollableSection({
 
   return (
     <section className={`relative ${className}`}>
-      <div ref={ref} className={innerClassName}>
+      <div
+        ref={ref}
+        className={`[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${innerClassName}`}
+      >
         {children}
       </div>
       {showArrow && (
