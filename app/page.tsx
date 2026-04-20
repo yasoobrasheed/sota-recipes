@@ -3,6 +3,7 @@ import Link from "next/link";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { users } from "@/lib/recipes";
+import Breadcrumb from "@/app/components/Breadcrumb";
 
 export default async function Home() {
   const convexUsers = await fetchQuery(api.users.list, {});
@@ -11,6 +12,8 @@ export default async function Home() {
   );
 
   return (
+    <>
+    <Breadcrumb items={[{ label: "home" }]} />
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 p-6 md:max-w-3xl md:flex-row md:items-center">
       {users.map((user, index) => {
         const convexUser = convexUserBySlug.get(user.slug);
@@ -52,5 +55,6 @@ export default async function Home() {
         );
       })}
     </main>
+    </>
   );
 }

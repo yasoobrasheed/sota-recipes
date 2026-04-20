@@ -4,6 +4,7 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import type { Id } from "@/convex/_generated/dataModel";
 import AddRecipeModal from "@/app/components/AddRecipeModal";
+import Breadcrumb from "@/app/components/Breadcrumb";
 import RecipeImage from "@/app/components/RecipeImage";
 
 export default async function UserRecipesPage({
@@ -22,7 +23,16 @@ export default async function UserRecipesPage({
     userId: convexUser._id,
   });
 
+  const firstName = convexUser.name.split(" ")[0].toLowerCase();
+
   return (
+    <>
+    <Breadcrumb
+      items={[
+        { label: "home", href: "/" },
+        { label: firstName },
+      ]}
+    />
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 p-6 md:max-w-5xl">
       <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
         {recipes.map((recipe) => {
@@ -55,5 +65,6 @@ export default async function UserRecipesPage({
       </div>
       <AddRecipeModal userId={convexUser._id} />
     </main>
+    </>
   );
 }
