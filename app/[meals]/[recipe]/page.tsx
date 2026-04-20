@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
@@ -9,7 +10,7 @@ export default async function RecipePage({
 }: {
   params: Promise<{ meals: string; recipe: string }>;
 }) {
-  const { recipe } = await params;
+  const { meals, recipe } = await params;
 
   const data = await fetchQuery(api.recipes.get, {
     id: recipe as Id<"recipes">,
@@ -42,7 +43,14 @@ export default async function RecipePage({
             <h2 className="text-lg font-semibold">Ingredients</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm">
               {data.ingredients.map((ing, i) => (
-                <li key={`${i}-${ing}`}>{ing}</li>
+                <li key={`${i}-${ing}`}>
+                  <Link
+                    href={`/${meals}/${recipe}/${encodeURIComponent(ing)}`}
+                    className="underline underline-offset-2"
+                  >
+                    {ing}
+                  </Link>
+                </li>
               ))}
             </ul>
           </section>
