@@ -47,7 +47,7 @@ export default async function RecipePage({
 
         <section className="md:min-h-0 md:overflow-y-auto md:pr-2">
           <h2 className="text-lg font-semibold">Method</h2>
-          <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm">
+          <ol className="mt-2 list-decimal space-y-2 pl-8 text-sm">
             {data.instructions.map((step, i) => (
               <li key={`${i}-${step}`}>{step}</li>
             ))}
