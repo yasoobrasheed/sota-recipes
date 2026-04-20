@@ -67,7 +67,7 @@ export default function ScrollableSection({
           type="button"
           onClick={scrollDown}
           aria-label="Scroll down"
-          className="absolute bottom-2 right-2 z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-black bg-white text-black shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition-all hover:-translate-y-px hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          className="absolute bottom-2 right-2 z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-zinc-500 bg-white text-zinc-500 shadow-[2px_2px_0_0_rgba(113,113,122,1)] transition-all hover:-translate-y-px hover:border-black hover:text-black hover:shadow-[2px_3px_0_0_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
         >
           <svg
             aria-hidden="true"
