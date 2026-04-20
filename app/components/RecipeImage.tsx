@@ -22,18 +22,47 @@ export default function RecipeImage({
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (!file) {
+      setFilePreview(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setFilePreview(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [file]);
+
+  useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") closeModal();
     }
+    function onPaste(e: ClipboardEvent) {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.kind === "file" && item.type.startsWith("image/")) {
+          const f = item.getAsFile();
+          if (f) {
+            e.preventDefault();
+            pickFile(f);
+            return;
+          }
+        }
+      }
+    }
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener("paste", onPaste);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("paste", onPaste);
+    };
   }, [open]);
 
   function closeModal() {
@@ -197,20 +226,36 @@ export default function RecipeImage({
                     >
                       {file ? (
                         <>
-                          <span className="text-sm text-black">
-                            {file.name}
-                          </span>
+                          {filePreview && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={filePreview}
+                              alt=""
+                              className="h-32 w-32 rounded-lg object-contain"
+                            />
+                          )}
                           <span className="text-xs text-zinc-500">
-                            tap to choose a different photo
+                            drop, paste, or select to replace
                           </span>
                         </>
                       ) : (
                         <>
-                          <span className="text-sm text-black">
-                            drag &amp; drop an image
-                          </span>
+                          <svg
+                            aria-hidden="true"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-6 w-6 text-zinc-500"
+                          >
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                          </svg>
                           <span className="text-xs text-zinc-500">
-                            or tap to choose from your device
+                            drop, paste, or select
                           </span>
                         </>
                       )}
